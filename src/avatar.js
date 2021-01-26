@@ -2,7 +2,71 @@ import { getEntity, read, swap, updateEntity } from './store/index';
 import { dataFns } from './utils/data_utils';
 import * as preload from './utils/preload_utils';
 import * as f from './utils/fn_utils';
-import * as l from './core/index';
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from './core/index';
 
 const { tget, tset } = dataFns(['avatar']);
 
@@ -13,7 +77,7 @@ export function requestAvatar(id, src) {
     return update(id, src, cache[src].url, cache[src].displayName, true);
   }
 
-  const provider = l.ui.avatarProvider(read(getEntity, 'lock', id)).toJS();
+  const provider = ui.avatarProvider(read(getEntity, 'lock', id)).toJS();
 
   swap(updateEntity, 'lock', id, m => {
     m = tset(m, 'syncStatus', 'loading');

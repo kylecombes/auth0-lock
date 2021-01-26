@@ -11,7 +11,72 @@ import {
   signUpHideUsernameField
 } from '../../connection/database/index';
 import CaptchaPane from '../../field/captcha/captcha_pane';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { swapCaptcha } from '../../connection/database/actions';
 
 export default class SignUpPane extends React.Component {
@@ -60,8 +125,8 @@ export default class SignUpPane extends React.Component {
       ));
 
     const captchaPane =
-      l.captcha(model) && l.captcha(model).get('required') ? (
-        <CaptchaPane i18n={i18n} lock={model} onReload={() => swapCaptcha(l.id(model), false)} />
+      captcha(model) && captcha(model).get('required') ? (
+        <CaptchaPane i18n={i18n} lock={model} onReload={() => swapCaptcha(id(model), false)} />
       ) : null;
 
     const passwordPane = !onlyEmail && (

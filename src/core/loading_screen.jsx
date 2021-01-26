@@ -2,7 +2,72 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Screen from './screen';
 import { pinLoadingPane, unpinLoadingPane } from './actions';
-import * as l from './index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from './index';
 
 export default class LoadingScreen extends Screen {
   constructor() {
@@ -17,8 +82,8 @@ export default class LoadingScreen extends Screen {
 class LoadingPane extends React.Component {
   componentDidMount() {
     const { model } = this.props;
-    pinLoadingPane(l.id(model));
-    setTimeout(() => unpinLoadingPane(l.id(model)), 500);
+    pinLoadingPane(id(model));
+    setTimeout(() => unpinLoadingPane(id(model)), 500);
   }
 
   render() {

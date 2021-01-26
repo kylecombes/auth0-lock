@@ -1,7 +1,72 @@
 import { Map } from 'immutable';
 import { dataFns } from './utils/data_utils';
 const { get, set } = dataFns(['sync']);
-import * as l from './core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from './core/index';
 
 import { getEntity, observe, read, swap, updateEntity } from './store/index';
 
@@ -10,7 +75,9 @@ export default (m, key, opts) => {
 
   const status = opts.waitFn
     ? 'waiting'
-    : !opts.conditionFn || opts.conditionFn(m) ? 'pending' : 'no';
+    : !opts.conditionFn || opts.conditionFn(m)
+    ? 'pending'
+    : 'no';
 
   return set(
     m,
@@ -53,7 +120,11 @@ const process = (m, id) => {
     if (getStatus(r, k) === 'pending') {
       r = setStatus(r, k, 'loading');
       let called = false;
-      getProp(r, k, 'syncFn')(r, (error, result) => {
+      getProp(
+        r,
+        k,
+        'syncFn'
+      )(r, (error, result) => {
         if (called) return;
         called = true;
         setTimeout(() => {
@@ -120,7 +191,7 @@ function handleError(m, key, error) {
     );
     stopError.code = 'sync';
     stopError.origin = error;
-    result = l.stop(result, stopError);
+    result = stop(result, stopError);
   }
 
   return result;

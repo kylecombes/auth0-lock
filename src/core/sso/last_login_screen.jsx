@@ -3,7 +3,72 @@ import Screen from '../screen';
 import QuickAuthPane from '../../ui/pane/quick_auth_pane';
 import { logIn, checkSession, skipQuickAuth } from '../../quick-auth/actions';
 import { lastUsedConnection, lastUsedUsername } from './index';
-import * as l from '../index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../index';
 import { renderSignedInConfirmation } from '../signed_in_confirmation';
 import { STRATEGIES as SOCIAL_STRATEGIES, authButtonsTheme } from '../../connection/social/index';
 
@@ -26,11 +91,11 @@ const Component = ({ i18n, model }) => {
   const buttonIcon = buttonTheme && buttonTheme.get('icon');
 
   const buttonClickHandler = () => {
-    const isUniversalLogin = window.location.host === l.domain(model);
+    const isUniversalLogin = window.location.host === domain(model);
     if (isUniversalLogin) {
-      logIn(l.id(model), lastUsedConnection(model), lastUsedUsername(model));
+      logIn(id(model), lastUsedConnection(model), lastUsedUsername(model));
     } else {
-      checkSession(l.id(model), lastUsedConnection(model), lastUsedUsername(model));
+      checkSession(id(model), lastUsedConnection(model), lastUsedUsername(model));
     }
   };
   const buttonLabel =
@@ -39,7 +104,7 @@ const Component = ({ i18n, model }) => {
   return (
     <QuickAuthPane
       alternativeLabel={i18n.str('notYourAccountAction')}
-      alternativeClickHandler={() => skipQuickAuth(l.id(model))}
+      alternativeClickHandler={() => skipQuickAuth(id(model))}
       buttonLabel={buttonLabel}
       buttonClickHandler={buttonClickHandler}
       header={header}

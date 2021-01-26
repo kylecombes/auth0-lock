@@ -2,7 +2,7 @@ import React from 'react';
 import Immutable, { Map } from 'immutable';
 import { format } from 'util';
 import sync from './sync';
-import * as l from './core/index';
+import { languageBaseUrl, ui, warn } from './core/index';
 import { dataFns } from './utils/data_utils';
 const { get, set } = dataFns(['i18n']);
 import enDictionary from './i18n/en';
@@ -23,8 +23,8 @@ export function group(m, keyPath) {
 }
 
 export function initI18n(m) {
-  const language = l.ui.language(m);
-  const overrides = l.ui.dict(m);
+  const language = ui.language(m);
+  const overrides = ui.dict(m);
   const defaultDictionary = Immutable.fromJS(enDictionary);
 
   let base = languageDictionaries[language] || Map({});
@@ -44,7 +44,7 @@ export function initI18n(m) {
       },
       recoverResult: m,
       errorFn: (m, error) => {
-        l.warn(m, error.message + ' Falling back to default dictionary.');
+        warn(m, error.message + ' Falling back to default dictionary.');
       }
     });
   } else {
@@ -59,7 +59,7 @@ export function initI18n(m) {
 function assertLanguage(m, language, base, path = '') {
   Object.keys(base).forEach(key => {
     if (!language.hasOwnProperty(key)) {
-      l.warn(m, `language does not have property ${path}${key}`);
+      warn(m, `language does not have property ${path}${key}`);
     } else {
       if (typeof base[key] === 'object') {
         assertLanguage(m, language[key], base[key], `${path}${key}.`);
@@ -73,7 +73,7 @@ function assertLanguage(m, language, base, path = '') {
 function syncLang(m, language, cb) {
   load({
     method: 'registerLanguageDictionary',
-    url: `${l.languageBaseUrl(m)}/js/lock/${__VERSION__}/${language}.js`,
+    url: `${languageBaseUrl(m)}/js/lock/${__VERSION__}/${language}.js`,
     check: str => str && str === language,
     cb: (err, _, dictionary) => {
       cb(err, dictionary);

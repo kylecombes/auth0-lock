@@ -7,7 +7,72 @@ import { renderPasswordResetConfirmation } from './password_reset_confirmation';
 import { databaseUsernameValue } from '../../connection/database/index';
 import { isEnterpriseDomain } from '../../connection/enterprise';
 import * as i18n from '../../i18n';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { swap, updateEntity } from '../../store/index';
 
 const Component = ({ i18n, model }) => {
@@ -50,13 +115,13 @@ export default class ResetPassword extends Screen {
         swap(
           updateEntity,
           'lock',
-          l.id(m),
-          l.setGlobalError,
+          id(m),
+          setGlobalError,
           i18n.str(m, ['error', 'forgotPassword', 'enterprise_email'])
         );
       }, 50);
     } else {
-      swap(updateEntity, 'lock', l.id(m), l.clearGlobalError);
+      swap(updateEntity, 'lock', id(m), clearGlobalError);
     }
     return tryingToResetPasswordWithEnterpriseEmail;
   }

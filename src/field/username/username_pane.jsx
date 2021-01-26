@@ -3,20 +3,85 @@ import React from 'react';
 import UsernameInput from '../../ui/input/username_input';
 import * as c from '../index';
 import { swap, updateEntity } from '../../store/index';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { setUsername, usernameLooksLikeEmail, getUsernameValidation } from '../username';
 import { debouncedRequestAvatar, requestAvatar } from '../../avatar';
 
 export default class UsernamePane extends React.Component {
   componentDidMount(e) {
     const { lock, validateFormat, usernameStyle, strictValidation } = this.props;
-    if (l.ui.avatar(lock) && c.username(lock)) {
-      requestAvatar(l.id(lock), c.username(lock));
+    if (ui.avatar(lock) && c.username(lock)) {
+      requestAvatar(id(lock), c.username(lock));
     }
     swap(
       updateEntity,
       'lock',
-      l.id(lock),
+      id(lock),
       setUsername,
       c.username(lock),
       usernameStyle,
@@ -27,13 +92,13 @@ export default class UsernamePane extends React.Component {
 
   handleChange(e) {
     const { lock, validateFormat, usernameStyle, strictValidation } = this.props;
-    if (l.ui.avatar(lock)) {
-      debouncedRequestAvatar(l.id(lock), e.target.value);
+    if (ui.avatar(lock)) {
+      debouncedRequestAvatar(id(lock), e.target.value);
     }
     swap(
       updateEntity,
       'lock',
-      l.id(lock),
+      id(lock),
       setUsername,
       e.target.value,
       usernameStyle,
@@ -44,7 +109,7 @@ export default class UsernamePane extends React.Component {
 
   render() {
     const { i18n, lock, placeholder, validateFormat } = this.props;
-    const allowAutocomplete = l.ui.allowAutocomplete(lock);
+    const allowAutocomplete = ui.allowAutocomplete(lock);
     const value = c.getFieldValue(lock, 'username');
     const usernameValidation = validateFormat ? getUsernameValidation(lock) : {};
 

@@ -1,7 +1,72 @@
 import React from 'react';
 import SuccessPane from '../../ui/box/success_pane';
 import { closeLock } from '../../core/actions';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import * as c from '../../field/index';
 
 import { resendEmail, restart } from './actions';
@@ -58,14 +123,14 @@ class Resend extends React.Component {
 
   handleClick = e => {
     e.preventDefault();
-    resendEmail(l.id(this.props.lock));
+    resendEmail(id(this.props.lock));
   };
 }
 
 export default class EmailSentConfirmation extends React.Component {
   render() {
     const { lock } = this.props;
-    const closeHandler = l.ui.closable(lock) ? this.handleClose : undefined;
+    const closeHandler = ui.closable(lock) ? this.handleClose : undefined;
     const labels = {
       failed: i18n.str(lock, 'failedLabel'),
       resend: i18n.str(lock, 'resendLabel'),
@@ -87,11 +152,11 @@ export default class EmailSentConfirmation extends React.Component {
   }
 
   handleBack() {
-    restart(l.id(this.props.lock));
+    restart(id(this.props.lock));
   }
 
   handleClose() {
-    closeLock(l.id(this.props.lock));
+    closeLock(id(this.props.lock));
   }
 }
 

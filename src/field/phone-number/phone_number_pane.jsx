@@ -7,7 +7,72 @@ import SelectInput from '../../ui/input/select_input';
 import { startOptionSelection } from '../actions';
 
 import * as c from '../index';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { swap, updateEntity } from '../../store/index';
 import { humanLocation, setPhoneNumber } from '../phone_number';
 
@@ -16,7 +81,7 @@ export const icon =
 
 export default class PhoneNumberPane extends React.Component {
   handlePhoneNumberChange(e) {
-    swap(updateEntity, 'lock', l.id(this.props.lock), setPhoneNumber, e.target.value);
+    swap(updateEntity, 'lock', id(this.props.lock), setPhoneNumber, e.target.value);
   }
 
   render() {
@@ -33,7 +98,7 @@ export default class PhoneNumberPane extends React.Component {
           name="location"
           placeholder=""
           label={humanLocation(lock)}
-          onClick={() => startOptionSelection(l.id(lock), 'location', '', icon)}
+          onClick={() => startOptionSelection(id(lock), 'location', '', icon)}
         />
         <PhoneNumberInput
           value={c.phoneNumber(lock)}
@@ -41,7 +106,7 @@ export default class PhoneNumberPane extends React.Component {
           invalidHint={invalidHint}
           onChange={::this.handlePhoneNumberChange}
           placeholder={placeholder}
-          disabled={l.submitting(lock)}
+          disabled={submitting(lock)}
         />
       </div>
     );

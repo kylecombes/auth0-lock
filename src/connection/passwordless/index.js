@@ -1,5 +1,70 @@
 import Immutable, { List, Map } from 'immutable';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { clearFields } from '../../field/index';
 import { initLocation } from '../../field/phone_number';
 import { dataFns } from '../../utils/data_utils';
@@ -19,7 +84,7 @@ export function initPasswordless(m, opts) {
   } else {
     m = sync(m, 'location', {
       recoverResult: 'US',
-      syncFn: (m, cb) => webAPI.getUserCountry(l.id(m), cb),
+      syncFn: (m, cb) => webAPI.getUserCountry(id(m), cb),
       successFn: (m, result) => initLocation(m, result)
     });
   }
@@ -73,7 +138,7 @@ export function restartPasswordless(m) {
   m = tremove(m, 'resendStatus'); // only for link
   m = clearFields(m, ['vcode']); // only for code
 
-  return l.clearGlobalError(m);
+  return clearGlobalError(m);
 }
 
 export function send(m) {
@@ -94,8 +159,8 @@ export function passwordlessStarted(m) {
 
 export function passwordlessConnection(m) {
   return (
-    l.connections(m, 'passwordless', 'email').get(0) ||
-    l.connections(m, 'passwordless', 'sms').get(0) ||
+    connections(m, 'passwordless', 'email').get(0) ||
+    connections(m, 'passwordless', 'sms').get(0) ||
     new Map()
   );
 }

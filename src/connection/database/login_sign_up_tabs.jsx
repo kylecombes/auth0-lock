@@ -1,7 +1,72 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { showLoginActivity, showSignUpActivity } from './actions';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { getScreen } from './index';
 import { closeLock } from '../../core/actions';
 
@@ -31,18 +96,18 @@ export default class LoginSignUpTabs extends React.Component {
   }
 
   handleLoginClick() {
-    showLoginActivity(l.id(this.props.lock));
+    showLoginActivity(id(this.props.lock));
   }
 
   handleSignUpClick() {
     if (this.props.signUpLink) {
-      closeLock(l.id(this.props.lock), true);
+      closeLock(id(this.props.lock), true);
     }
-    showSignUpActivity(l.id(this.props.lock));
+    showSignUpActivity(id(this.props.lock));
   }
 
   handleSignUpWithHrefClick() {
-    closeLock(l.id(this.props.lock), true);
+    closeLock(id(this.props.lock), true);
   }
 }
 

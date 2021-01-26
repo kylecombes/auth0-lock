@@ -4,7 +4,72 @@ import ReactDOM from 'react-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import MultisizeSlide from './multisize_slide';
 import GlobalMessage from './global_message';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import Header from './header';
 
 const submitSvg =
@@ -17,17 +82,17 @@ class SubmitButton extends React.Component {
     const { label, screenName, contentProps } = this.props;
     const { model } = contentProps;
     if (screenName === 'main.signUp') {
-      l.emitEvent(model, 'signup submit');
+      emitEvent(model, 'signup submit');
     } else if (screenName === 'main.login') {
-      l.emitEvent(model, 'signin submit');
+      emitEvent(model, 'signin submit');
     } else if (screenName === 'forgotPassword') {
-      l.emitEvent(model, 'forgot_password submit');
+      emitEvent(model, 'forgot_password submit');
     } else if (screenName === 'socialOrEmail') {
-      l.emitEvent(model, 'socialOrEmail submit');
+      emitEvent(model, 'socialOrEmail submit');
     } else if (screenName === 'socialOrPhoneNumber') {
-      l.emitEvent(model, 'socialOrPhoneNumber submit');
+      emitEvent(model, 'socialOrPhoneNumber submit');
     } else if (screenName === 'vcode') {
-      l.emitEvent(model, 'vcode submit');
+      emitEvent(model, 'vcode submit');
     }
 
     if (this.props.onSubmit) {

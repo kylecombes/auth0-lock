@@ -3,7 +3,72 @@ import Screen from '../../core/screen';
 import QuickAuthPane from '../../ui/pane/quick_auth_pane';
 import { logIn, skipQuickAuth } from '../../quick-auth/actions';
 import { renderSignedInConfirmation } from '../../core/signed_in_confirmation';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { corpNetworkConnection } from '../enterprise';
 
 const Component = ({ i18n, model }) => {
@@ -13,9 +78,9 @@ const Component = ({ i18n, model }) => {
   return (
     <QuickAuthPane
       alternativeLabel={i18n.str('notYourAccountAction')}
-      alternativeClickHandler={() => skipQuickAuth(l.id(model))}
+      alternativeClickHandler={() => skipQuickAuth(id(model))}
       buttonLabel={i18n.str('windowsAuthLabel')}
-      buttonClickHandler={e => logIn(l.id(model), corpNetworkConnection(model))}
+      buttonClickHandler={e => logIn(id(model), corpNetworkConnection(model))}
       header={header}
       strategy="windows"
     />

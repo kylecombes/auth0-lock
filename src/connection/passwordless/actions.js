@@ -3,7 +3,72 @@ import { read, getEntity, swap, updateEntity } from '../../store/index';
 import { closeLock, logIn as coreLogIn, validateAndSubmit, logInSuccess } from '../../core/actions';
 import webApi from '../../core/web_api';
 import * as c from '../../field/index';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import {
   isEmail,
   isSendLink,
@@ -42,7 +107,7 @@ export function requestPasswordlessEmail(id) {
 
 export function requestPasswordlessEmailSuccess(id) {
   swap(updateEntity, 'lock', id, m => {
-    m = l.setSubmitting(m, false);
+    m = setSubmitting(m, false);
     return setPasswordlessStarted(m, true);
   });
 }
@@ -50,7 +115,7 @@ export function requestPasswordlessEmailSuccess(id) {
 export function requestPasswordlessEmailError(id, error) {
   const m = read(getEntity, 'lock', id);
   const errorMessage = getErrorMessage(m, error);
-  return swap(updateEntity, 'lock', id, l.setSubmitting, false, errorMessage);
+  return swap(updateEntity, 'lock', id, setSubmitting, false, errorMessage);
 }
 
 export function resendEmail(id) {
@@ -74,15 +139,15 @@ function sendEmail(m, successFn, errorFn) {
     send: send(m)
   };
 
-  if (isSendLink(m) && !l.auth.params(m).isEmpty()) {
-    params.authParams = l.auth.params(m).toJS();
+  if (isSendLink(m) && !auth.params(m).isEmpty()) {
+    params.authParams = auth.params(m).toJS();
   }
 
-  webApi.startPasswordless(l.id(m), params, error => {
+  webApi.startPasswordless(id(m), params, error => {
     if (error) {
-      setTimeout(() => errorFn(l.id(m), error), 250);
+      setTimeout(() => errorFn(id(m), error), 250);
     } else {
-      successFn(l.id(m));
+      successFn(id(m));
     }
   });
 }
@@ -106,7 +171,7 @@ export function sendSMS(id) {
 
 function sendSMSSuccess(id) {
   swap(updateEntity, 'lock', id, m => {
-    m = l.setSubmitting(m, false);
+    m = setSubmitting(m, false);
     m = setPasswordlessStarted(m, true);
     return m;
   });
@@ -115,13 +180,13 @@ function sendSMSSuccess(id) {
 function sendSMSError(id, error) {
   const m = read(getEntity, 'lock', id);
   const errorMessage = getErrorMessage(m, error);
-  l.emitAuthorizationErrorEvent(m, error);
-  return swap(updateEntity, 'lock', id, l.setSubmitting, false, errorMessage);
+  emitAuthorizationErrorEvent(m, error);
+  return swap(updateEntity, 'lock', id, setSubmitting, false, errorMessage);
 }
 
 export function logIn(id) {
   const m = read(getEntity, 'lock', id);
-  const authParams = l.auth.params(m).toJS();
+  const authParams = auth.params(m).toJS();
   const params = {
     verificationCode: c.getFieldValue(m, 'vcode'),
     ...authParams
@@ -133,7 +198,7 @@ export function logIn(id) {
     params.connection = 'sms';
     params.phoneNumber = phoneNumberWithDiallingCode(m);
   }
-  swap(updateEntity, 'lock', id, l.setSubmitting, true);
+  swap(updateEntity, 'lock', id, setSubmitting, true);
   webApi.passwordlessVerify(id, params, (error, result) => {
     let errorMessage;
     if (error) {
@@ -142,8 +207,8 @@ export function logIn(id) {
       if (error.logToConsole) {
         console.error(error.description);
       }
-      l.emitAuthorizationErrorEvent(m, error);
-      return swap(updateEntity, 'lock', id, l.setSubmitting, false, errorMessage);
+      emitAuthorizationErrorEvent(m, error);
+      return swap(updateEntity, 'lock', id, setSubmitting, false, errorMessage);
     } else {
       return logInSuccess(id, result);
     }

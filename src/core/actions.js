@@ -10,29 +10,52 @@ import {
   updateEntity
 } from '../store/index';
 import { syncRemoteData } from './remote_data';
-import * as l from './index';
+import {
+  setup,
+  withAuthOptions,
+  runHook,
+  ui,
+  auth,
+  emitAuthenticatedEvent,
+  emitAuthorizationErrorEvent,
+  emitEvent,
+  emitHashParsedEvent,
+  emitUnrecoverableErrorEvent,
+  filterConnections,
+  loginErrorMessage,
+  overrideOptions,
+  render,
+  rendering,
+  id,
+  hashCleanup,
+  submitting,
+  reset,
+  setLoggedIn,
+  setSubmitting,
+  stopRendering
+} from './index';
 import { img as preload } from '../utils/preload_utils';
 import { defaultProps } from '../ui/box/container';
 import { isFieldValid, showInvalidField, hideInvalidFields, clearFields } from '../field/index';
 
 export function setupLock(id, clientID, domain, options, hookRunner, emitEventFn, handleEventFn) {
-  let m = l.setup(id, clientID, domain, options, hookRunner, emitEventFn, handleEventFn);
+  let m = setup(id, clientID, domain, options, hookRunner, emitEventFn, handleEventFn);
 
   m = syncRemoteData(m);
 
-  preload(l.ui.logo(m) || defaultProps.logo);
+  preload(ui.logo(m) || defaultProps.logo);
 
   webApi.setupClient(
     id,
     clientID,
     domain,
-    l.withAuthOptions(m, {
+    withAuthOptions(m, {
       ...options,
-      popupOptions: l.ui.popupOptions(m)
+      popupOptions: ui.popupOptions(m)
     })
   );
 
-  m = l.runHook(m, 'didInitialize', options);
+  m = runHook(m, 'didInitialize', options);
 
   swap(setEntity, 'lock', id, m);
 
@@ -41,7 +64,7 @@ export function setupLock(id, clientID, domain, options, hookRunner, emitEventFn
 
 export function handleAuthCallback() {
   const ms = read(getCollection, 'lock');
-  const keepHash = ms.filter(m => !l.hashCleanup(m)).size > 0;
+  const keepHash = ms.filter(m => !hashCleanup(m)).size > 0;
   const urlWithoutHash = global.location.href.split('#')[0];
   const callback = (error, authResult) => {
     const parsed = !!(error || authResult);
@@ -54,21 +77,21 @@ export function handleAuthCallback() {
 
 export function resumeAuth(hash, callback) {
   const ms = read(getCollection, 'lock');
-  ms.forEach(m => l.auth.redirect(m) && parseHash(m, hash, callback));
+  ms.forEach(m => auth.redirect(m) && parseHash(m, hash, callback));
 }
 
 function parseHash(m, hash, cb) {
-  webApi.parseHash(l.id(m), hash, function(error, authResult) {
+  webApi.parseHash(id(m), hash, function(error, authResult) {
     if (error) {
-      l.emitHashParsedEvent(m, error);
+      emitHashParsedEvent(m, error);
     } else {
-      l.emitHashParsedEvent(m, authResult);
+      emitHashParsedEvent(m, authResult);
     }
 
     if (error) {
-      l.emitAuthorizationErrorEvent(m, error);
+      emitAuthorizationErrorEvent(m, error);
     } else if (authResult) {
-      l.emitAuthenticatedEvent(m, authResult);
+      emitAuthenticatedEvent(m, authResult);
     }
     cb(error, authResult);
   });
@@ -80,30 +103,30 @@ export function openLock(id, opts) {
     throw new Error("The Lock can't be opened again after it has been destroyed");
   }
 
-  if (l.rendering(m)) {
+  if (rendering(m)) {
     return false;
   }
 
   if (opts.flashMessage) {
     const supportedTypes = ['error', 'success', 'info'];
     if (!opts.flashMessage.type || supportedTypes.indexOf(opts.flashMessage.type) === -1) {
-      return l.emitUnrecoverableErrorEvent(
+      return emitUnrecoverableErrorEvent(
         m,
         "'flashMessage' must provide a valid type ['error','success','info']"
       );
     }
     if (!opts.flashMessage.text) {
-      return l.emitUnrecoverableErrorEvent(m, "'flashMessage' must provide a text");
+      return emitUnrecoverableErrorEvent(m, "'flashMessage' must provide a text");
     }
   }
 
-  l.emitEvent(m, 'show');
+  emitEvent(m, 'show');
 
   swap(updateEntity, 'lock', id, m => {
-    m = l.overrideOptions(m, opts);
-    m = l.filterConnections(m);
-    m = l.runHook(m, 'willShow', opts);
-    return l.render(m);
+    m = overrideOptions(m, opts);
+    m = filterConnections(m);
+    m = runHook(m, 'willShow', opts);
+    return render(m);
   });
 
   return true;
@@ -112,21 +135,21 @@ export function openLock(id, opts) {
 export function closeLock(id, force = false, callback = () => {}) {
   // Do nothing when the Lock can't be closed, unless closing is forced.
   let m = read(getEntity, 'lock', id);
-  if ((!l.ui.closable(m) && !force) || !l.rendering(m)) {
+  if ((!ui.closable(m) && !force) || !rendering(m)) {
     return;
   }
 
-  l.emitEvent(m, 'hide');
+  emitEvent(m, 'hide');
 
   // If it is a modal, stop rendering an reset after a second,
   // otherwise just reset.
-  if (l.ui.appendContainer(m)) {
-    swap(updateEntity, 'lock', id, l.stopRendering);
+  if (ui.appendContainer(m)) {
+    swap(updateEntity, 'lock', id, stopRendering);
 
     setTimeout(() => {
       swap(updateEntity, 'lock', id, m => {
         m = hideInvalidFields(m);
-        m = l.reset(m);
+        m = reset(m);
         m = clearFields(m);
         return m;
       });
@@ -136,7 +159,7 @@ export function closeLock(id, force = false, callback = () => {}) {
   } else {
     swap(updateEntity, 'lock', id, m => {
       m = hideInvalidFields(m);
-      m = l.reset(m);
+      m = reset(m);
       m = clearFields(m);
       return m;
     });
@@ -145,7 +168,7 @@ export function closeLock(id, force = false, callback = () => {}) {
 }
 
 export function removeLock(id) {
-  swap(updateEntity, 'lock', id, l.stopRendering);
+  swap(updateEntity, 'lock', id, stopRendering);
   swap(removeEntity, 'lock', id);
 }
 
@@ -168,11 +191,11 @@ export function validateAndSubmit(id, fields = [], f) {
   swap(updateEntity, 'lock', id, m => {
     const allFieldsValid = fields.reduce((r, x) => r && isFieldValid(m, x), true);
     return allFieldsValid
-      ? l.setSubmitting(m, true)
+      ? setSubmitting(m, true)
       : fields.reduce((r, x) => showInvalidField(r, x), m);
   });
   const m = read(getEntity, 'lock', id);
-  if (l.submitting(m)) {
+  if (submitting(m)) {
     f(m);
   }
 }
@@ -184,7 +207,7 @@ export function logIn(
   logInErrorHandler = (_id, error, _fields, next) => next()
 ) {
   validateAndSubmit(id, fields, m => {
-    webApi.logIn(id, params, l.auth.params(m).toJS(), (error, result) => {
+    webApi.logIn(id, params, auth.params(m).toJS(), (error, result) => {
       if (error) {
         setTimeout(() => logInError(id, fields, error, logInErrorHandler), 250);
       } else {
@@ -196,7 +219,7 @@ export function logIn(
 
 export function checkSession(id, params = {}) {
   const m = read(getEntity, 'lock', id);
-  swap(updateEntity, 'lock', id, m => l.setSubmitting(m, true));
+  swap(updateEntity, 'lock', id, m => setSubmitting(m, true));
   webApi.checkSession(id, params, (err, result) => {
     if (err) {
       return logInError(id, [], err);
@@ -208,14 +231,14 @@ export function checkSession(id, params = {}) {
 export function logInSuccess(id, result) {
   const m = read(getEntity, 'lock', id);
 
-  if (!l.ui.autoclose(m)) {
+  if (!ui.autoclose(m)) {
     swap(updateEntity, 'lock', id, m => {
-      m = l.setSubmitting(m, false);
-      return l.setLoggedIn(m, true);
+      m = setSubmitting(m, false);
+      return setLoggedIn(m, true);
     });
-    l.emitAuthenticatedEvent(m, result);
+    emitAuthenticatedEvent(m, result);
   } else {
-    closeLock(id, false, m1 => l.emitAuthenticatedEvent(m1, result));
+    closeLock(id, false, m1 => emitAuthenticatedEvent(m1, result));
   }
 }
 
@@ -224,7 +247,7 @@ function logInError(id, fields, error, localHandler = (_id, _error, _fields, nex
   localHandler(id, error, fields, () =>
     setTimeout(() => {
       const m = read(getEntity, 'lock', id);
-      const errorMessage = l.loginErrorMessage(m, error, loginType(fields));
+      const errorMessage = loginErrorMessage(m, error, loginType(fields));
       const errorCodesThatEmitAuthorizationErrorEvent = [
         'blocked_user',
         'rule_error',
@@ -234,14 +257,14 @@ function logInError(id, fields, error, localHandler = (_id, _error, _fields, nex
       ];
 
       if (errorCodesThatEmitAuthorizationErrorEvent.indexOf(errorCode) > -1) {
-        l.emitAuthorizationErrorEvent(m, error);
+        emitAuthorizationErrorEvent(m, error);
       }
 
-      swap(updateEntity, 'lock', id, l.setSubmitting, false, errorMessage);
+      swap(updateEntity, 'lock', id, setSubmitting, false, errorMessage);
     }, 0)
   );
 
-  swap(updateEntity, 'lock', id, l.setSubmitting, false);
+  swap(updateEntity, 'lock', id, setSubmitting, false);
 }
 
 function loginType(fields) {

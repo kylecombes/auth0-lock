@@ -88,7 +88,7 @@ describe('quick-auth.actions', () => {
     const l = require('../../core/index');
 
     expect(swap.mock.calls.length).toBe(1);
-    expect(swap.mock.calls[0][3]).toBe(l.setSupressSubmitOverlay);
+    expect(swap.mock.calls[0][3]).toBe(setSupressSubmitOverlay);
     expect(swap.mock.calls[0][4]).toBe(true);
   });
 
@@ -110,7 +110,7 @@ describe('quick-auth.actions', () => {
     const l = require('../../core/index');
 
     expect(swap.mock.calls.length).toBe(1);
-    expect(swap.mock.calls[0][3]).toBe(l.setSupressSubmitOverlay);
+    expect(swap.mock.calls[0][3]).toBe(setSupressSubmitOverlay);
     expect(swap.mock.calls[0][4]).toBe(false);
   });
 });

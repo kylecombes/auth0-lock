@@ -30,7 +30,19 @@ import {
 import { defaultDirectory, defaultDirectoryName } from '../core/tenant';
 import { setEmail } from '../field/email';
 import { setUsername } from '../field/username';
-import * as l from '../core/index';
+import {
+  ui,
+  hasConnection,
+  findConnection,
+  hasStopped,
+  id,
+  prefill,
+  warn,
+  error,
+  stop,
+  hasSomeConnections,
+  hasOnlyConnections
+} from '../core/index';
 import KerberosScreen from '../connection/enterprise/kerberos_screen';
 import HRDScreen from '../connection/enterprise/hrd_screen';
 import EnterpriseQuickAuthScreen from '../connection/enterprise/quick_auth_screen';
@@ -56,40 +68,40 @@ export function usernameStyle(m) {
 }
 
 export function hasOnlyClassicConnections(m, type = undefined, ...strategies) {
-  return l.hasOnlyConnections(m, type, ...strategies) && !l.hasSomeConnections(m, 'passwordless');
+  return hasOnlyConnections(m, type, ...strategies) && !hasSomeConnections(m, 'passwordless');
 }
 
 function validateAllowedConnections(m) {
-  const anyDBConnection = l.hasSomeConnections(m, 'database');
-  const anySocialConnection = l.hasSomeConnections(m, 'social');
-  const anyEnterpriseConnection = l.hasSomeConnections(m, 'enterprise');
+  const anyDBConnection = hasSomeConnections(m, 'database');
+  const anySocialConnection = hasSomeConnections(m, 'social');
+  const anyEnterpriseConnection = hasSomeConnections(m, 'enterprise');
 
   if (!anyDBConnection && !anySocialConnection && !anyEnterpriseConnection) {
     const error = new Error(
       'At least one database, enterprise or social connection needs to be available.'
     );
     error.code = 'no_connection';
-    m = l.stop(m, error);
+    m = stop(m, error);
   } else if (!anyDBConnection && hasInitialScreen(m, 'forgotPassword')) {
     const error = new Error(
       'The `initialScreen` option was set to "forgotPassword" but no database connection is available.'
     );
     error.code = 'unavailable_initial_screen';
-    m = l.stop(m, error);
+    m = stop(m, error);
   } else if (!anyDBConnection && !anySocialConnection && hasInitialScreen(m, 'signUp')) {
     const error = new Error(
       'The `initialScreen` option was set to "signUp" but no database or social connection is available.'
     );
     error.code = 'unavailable_initial_screen';
-    m = l.stop(m, error);
+    m = stop(m, error);
   }
 
   if (defaultDirectoryName(m) && !defaultDirectory(m)) {
-    l.error(m, `The account's default directory "${defaultDirectoryName(m)}" is not enabled.`);
+    error(m, `The account's default directory "${defaultDirectoryName(m)}" is not enabled.`);
   }
 
   if (defaultDatabaseConnectionName(m) && !defaultDatabaseConnection(m)) {
-    l.warn(
+    warn(
       m,
       `The provided default database connection "${defaultDatabaseConnectionName(
         m
@@ -98,7 +110,7 @@ function validateAllowedConnections(m) {
   }
 
   if (defaultEnterpriseConnectionName(m) && !defaultEnterpriseConnection(m)) {
-    l.warn(
+    warn(
       m,
       `The provided default enterprise connection "${defaultEnterpriseConnectionName(
         m
@@ -110,7 +122,7 @@ function validateAllowedConnections(m) {
 }
 
 const setPrefill = m => {
-  const { email, username } = l.prefill(m).toJS();
+  const { email, username } = prefill(m).toJS();
   if (typeof email === 'string') m = setEmail(m, email);
   if (typeof username === 'string') m = setUsername(m, username, 'username', false);
   return m;
@@ -118,7 +130,7 @@ const setPrefill = m => {
 
 function createErrorScreen(m, stopError) {
   setTimeout(() => {
-    swap(updateEntity, 'lock', l.id(m), l.stop, stopError);
+    swap(updateEntity, 'lock', id(m), stop, stopError);
   }, 0);
 
   return new ErrorScreen();
@@ -156,7 +168,7 @@ class Classic {
 
   render(m) {
     //if there's an error, we should show the error screen no matter what.
-    if (l.hasStopped(m)) {
+    if (hasStopped(m)) {
       return new ErrorScreen();
     }
 
@@ -172,14 +184,14 @@ class Classic {
           return new KerberosScreen();
         }
 
-        if (l.ui.rememberLastLogin(m)) {
+        if (ui.rememberLastLogin(m)) {
           const lastUsedConnection = sso.lastUsedConnection(m);
           const lastUsedUsername = sso.lastUsedUsername(m);
           if (
             lastUsedConnection &&
             isSuccess(m, 'sso') &&
-            l.hasConnection(m, lastUsedConnection.get('name')) &&
-            l.findConnection(m, lastUsedConnection.get('name')).get('type') !== 'passwordless'
+            hasConnection(m, lastUsedConnection.get('name')) &&
+            findConnection(m, lastUsedConnection.get('name')).get('type') !== 'passwordless'
           ) {
             return new LastLoginScreen();
           }

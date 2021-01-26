@@ -15,7 +15,7 @@ import {
 import { logIn as databaseLogIn } from '../../connection/database/actions';
 import { renderSignedInConfirmation } from '../../core/signed_in_confirmation';
 import LoginSignUpTabs from '../../connection/database/login_sign_up_tabs';
-import * as l from '../../core/index';
+import { hasSomeConnections, countConnections } from '../../core/index';
 import { logIn as enterpriseLogIn, startHRD } from '../../connection/enterprise/actions';
 import {
   defaultEnterpriseConnection,
@@ -28,8 +28,8 @@ import * as i18n from '../../i18n';
 
 function shouldRenderTabs(m) {
   if (isSSOEnabled(m)) return false;
-  if (l.hasSomeConnections(m, 'database')) return hasScreen(m, 'signUp');
-  if (l.hasSomeConnections(m, 'social') && hasInitialScreen(m, 'signUp'))
+  if (hasSomeConnections(m, 'database')) return hasScreen(m, 'signUp');
+  if (hasSomeConnections(m, 'social') && hasInitialScreen(m, 'signUp'))
     return hasScreen(m, 'signUp');
 }
 
@@ -47,7 +47,7 @@ const Component = ({ i18n, model }) => {
     />
   );
 
-  const social = l.hasSomeConnections(model, 'social') && (
+  const social = hasSomeConnections(model, 'social') && (
     <SocialButtonsPane
       instructions={i18n.html('socialLoginInstructions')}
       labelFn={i18n.str}
@@ -58,24 +58,24 @@ const Component = ({ i18n, model }) => {
   );
 
   const showPassword =
-    !sso && (l.hasSomeConnections(model, 'database') || !!findADConnectionWithoutDomain(model));
+    !sso && (hasSomeConnections(model, 'database') || !!findADConnectionWithoutDomain(model));
 
-  const showForgotPasswordLink = showPassword && l.hasSomeConnections(model, 'database');
+  const showForgotPasswordLink = showPassword && hasSomeConnections(model, 'database');
 
   const loginInstructionsKey = social
     ? 'databaseEnterpriseAlternativeLoginInstructions'
     : 'databaseEnterpriseLoginInstructions';
 
   const usernameInputPlaceholderKey =
-    databaseUsernameStyle(model) === 'any' || l.countConnections(model, 'enterprise') > 1
+    databaseUsernameStyle(model) === 'any' || countConnections(model, 'enterprise') > 1
       ? 'usernameOrEmailInputPlaceholder'
       : 'usernameInputPlaceholder';
 
   const usernameStyle = databaseUsernameStyle(model);
 
   const login = (sso ||
-    l.hasSomeConnections(model, 'database') ||
-    l.hasSomeConnections(model, 'enterprise')) && (
+    hasSomeConnections(model, 'database') ||
+    hasSomeConnections(model, 'enterprise')) && (
     <LoginPane
       emailInputPlaceholder={i18n.str('emailInputPlaceholder')}
       forgotPasswordAction={i18n.str('forgotPasswordAction')}
@@ -129,7 +129,7 @@ export default class Login extends Screen {
     // requires username/password and there is no enterprise with domain
     // that matches with the email domain entered for HRD
     return (
-      !l.hasSomeConnections(m, 'database') && // no database connection
+      !hasSomeConnections(m, 'database') && // no database connection
       !findADConnectionWithoutDomain(m) && // no enterprise without domain
       !isSSOEnabled(m)
     ); // no matching domain

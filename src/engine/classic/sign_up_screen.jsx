@@ -15,7 +15,72 @@ import { renderOptionSelection } from '../../field/index';
 import { logIn as enterpriseLogIn, startHRD } from '../../connection/enterprise/actions';
 import { databaseUsernameValue } from '../../connection/database/index';
 import { isHRDDomain } from '../../connection/enterprise';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import * as i18n from '../../i18n';
 
 import SignUpPane from './sign_up_pane';
@@ -38,7 +103,7 @@ const Component = ({ i18n, model }) => {
     />
   );
 
-  const social = l.hasSomeConnections(model, 'social') && (
+  const social = hasSomeConnections(model, 'social') && (
     <SocialButtonsPane
       instructions={i18n.html('socialSignUpInstructions')}
       labelFn={i18n.str}
@@ -51,8 +116,7 @@ const Component = ({ i18n, model }) => {
     ? 'databaseAlternativeSignUpInstructions'
     : 'databaseSignUpInstructions';
 
-  const db = (l.hasSomeConnections(model, 'database') ||
-    l.hasSomeConnections(model, 'enterprise')) && (
+  const db = (hasSomeConnections(model, 'database') || hasSomeConnections(model, 'enterprise')) && (
     <SignUpPane
       emailInputPlaceholder={i18n.str('emailInputPlaceholder')}
       i18n={i18n}
@@ -123,7 +187,7 @@ export default class SignUp extends Screen {
   }
 
   renderTerms(m, terms) {
-    const checkHandler = mustAcceptTerms(m) ? () => toggleTermsAcceptance(l.id(m)) : undefined;
+    const checkHandler = mustAcceptTerms(m) ? () => toggleTermsAcceptance(id(m)) : undefined;
     return terms && showTerms(m) ? (
       <SignUpTerms
         showCheckbox={mustAcceptTerms(m)}

@@ -61,7 +61,7 @@ describe('The quick auth screen', () => {
     quickAuthConnection.mockReturnValue(mockConnection);
 
     const l = require('core/index');
-    l.ui.preferConnectionDisplayName.mockReturnValue(true);
+    ui.preferConnectionDisplayName.mockReturnValue(true);
 
     const Component = getComponent();
 
@@ -78,7 +78,7 @@ describe('The quick auth screen', () => {
     quickAuthConnection.mockReturnValue(mockConnection);
 
     const l = require('core/index');
-    l.ui.preferConnectionDisplayName.mockReturnValue(true);
+    ui.preferConnectionDisplayName.mockReturnValue(true);
 
     const Component = getComponent();
 
@@ -95,7 +95,7 @@ describe('The quick auth screen', () => {
     quickAuthConnection.mockReturnValue(mockConnection);
 
     const l = require('core/index');
-    l.ui.preferConnectionDisplayName.mockReturnValue(true);
+    ui.preferConnectionDisplayName.mockReturnValue(true);
 
     const Component = getComponent();
 

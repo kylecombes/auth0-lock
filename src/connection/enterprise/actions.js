@@ -8,7 +8,72 @@ import {
 import { getFieldValue, hideInvalidFields } from '../../field/index';
 import { emailLocalPart } from '../../field/email';
 import { logIn as coreLogIn } from '../../core/actions';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 
 // TODO: enterprise connections should not depend on database
 // connections. However, we now allow a username input to contain also
@@ -31,7 +96,7 @@ export function cancelHRD(id) {
 }
 
 function getConnectionScopesFrom(m, connection) {
-  const connectionScopes = l.auth.connectionScopes(m);
+  const connectionScopes = auth.connectionScopes(m);
   return connectionScopes.get(connection.get('name'));
 }
 
@@ -60,7 +125,7 @@ function logInActiveFlow(id, params) {
   const originalUsername = getFieldValue(m, usernameField);
   const connection = enterpriseActiveFlowConnection(m);
 
-  const username = l.defaultADUsernameFromEmailPrefix(m)
+  const username = defaultADUsernameFromEmailPrefix(m)
     ? emailLocalPart(originalUsername)
     : originalUsername;
 
@@ -77,7 +142,7 @@ function logInSSO(id, connection, params) {
   const m = read(getEntity, 'lock', id);
   const field = databaseLogInWithEmail(m) ? 'email' : 'username';
 
-  l.emitEvent(m, 'sso login', {
+  emitEvent(m, 'sso login', {
     lockID: id,
     connection: connection,
     field: field

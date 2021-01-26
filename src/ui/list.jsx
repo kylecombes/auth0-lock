@@ -5,7 +5,72 @@ import { BackButton } from './box/button';
 import TextInput from './input/text_input';
 import { isSmallScreen } from '../utils/media_utils';
 import * as su from '../utils/string_utils';
-import * as l from '../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../core/index';
 
 const cycle = (xs, x) => {
   return xs.skipWhile(y => y !== x).get(1, xs.get(0));
@@ -70,9 +135,9 @@ export default class FiltrableList extends React.Component {
     return (
       <div className="auth0-lock-select-country">
         <div className="auth0-lock-search">
-          <BackButton lockId={l.id(model)} onClick={onCancel} />
+          <BackButton lockId={id(model)} onClick={onCancel} />
           <TextInput
-            lockId={l.id(model)}
+            lockId={id(model)}
             name="search"
             icon={icon}
             iconUrl={iconUrl}

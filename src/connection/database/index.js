@@ -1,5 +1,14 @@
 import Immutable, { List, Map } from 'immutable';
-import * as l from '../../core/index';
+import {
+  warn,
+  resolvedConnection,
+  connection,
+  clearGlobalSuccess,
+  clearGlobalError,
+  hasSomeConnections,
+  connectionResolver,
+  findConnection
+} from '../../core/index';
 import {
   hideInvalidFields,
   clearFields,
@@ -23,14 +32,14 @@ export function initDatabase(m, options) {
 
 function assertMaybeBoolean(opts, name) {
   const valid = opts[name] === undefined || typeof opts[name] === 'boolean';
-  if (!valid) l.warn(opts, `The \`${name}\` option will be ignored, because it is not a booelan.`);
+  if (!valid) warn(opts, `The \`${name}\` option will be ignored, because it is not a booelan.`);
   return valid;
 }
 
 function assertMaybeEnum(opts, name, a) {
   const valid = opts[name] === undefined || a.indexOf(opts[name]) > -1;
   if (!valid)
-    l.warn(
+    warn(
       opts,
       `The \`${name}\` option will be ignored, because it is not one of the following allowed values: ${a
         .map(x => JSON.stringify(x))
@@ -43,13 +52,13 @@ function assertMaybeString(opts, name) {
   const valid =
     opts[name] === undefined || (typeof opts[name] === 'string' && trim(opts[name]).length > 0);
   if (!valid)
-    l.warn(opts, `The \`${name}\` option will be ignored, because it is not a non-empty string.`);
+    warn(opts, `The \`${name}\` option will be ignored, because it is not a non-empty string.`);
   return valid;
 }
 
 function assertMaybeArray(opts, name) {
   const valid = opts[name] === undefined || global.Array.isArray(opts[name]);
-  if (!valid) l.warn(opts, `The \`${name}\` option will be ignored, because it is not an array.`);
+  if (!valid) warn(opts, `The \`${name}\` option will be ignored, because it is not an array.`);
   return valid;
 }
 
@@ -125,7 +134,7 @@ function processDatabaseOptions(opts) {
         !name.match(/^[a-zA-Z0-9_]+$/) ||
         reservedNames.indexOf(name) > -1
       ) {
-        l.warn(
+        warn(
           opts,
           `Ignoring an element of \`additionalSignUpFields\` because it does not contain valid \`name\` property. Every element of \`additionalSignUpFields\` must be an object with a \`name\` property that is a non-empty string consisting of letters, numbers and underscores. The following names are reserved, and therefore, cannot be used: ${reservedNames.join(
             ', '
@@ -139,7 +148,7 @@ function processDatabaseOptions(opts) {
         (typeof placeholder != 'string' || !placeholder) &&
         (typeof placeholderHTML != 'string' || !placeholderHTML)
       ) {
-        l.warn(
+        warn(
           opts,
           `Ignoring an element of \`additionalSignUpFields\` (${name}) because it does not contain a valid \`placeholder\` or \`placeholderHTML\` property. Every element of \`additionalSignUpFields\` must have a \`placeholder\` or \`placeholderHTML\` property that is a non-empty string.`
         );
@@ -147,14 +156,14 @@ function processDatabaseOptions(opts) {
       }
 
       if (placeholderHTML && placeholder) {
-        l.warn(
+        warn(
           opts,
           'When provided, the `placeholderHTML` property of an element of `additionalSignUpFields` will override the `placeholder` property of that element'
         );
       }
 
       if (icon != undefined && (typeof icon != 'string' || !icon)) {
-        l.warn(
+        warn(
           opts,
           'When provided, the `icon` property of an element of `additionalSignUpFields` must be a non-empty string.'
         );
@@ -166,7 +175,7 @@ function processDatabaseOptions(opts) {
         (typeof prefill != 'string' || !prefill) &&
         typeof prefill != 'function'
       ) {
-        l.warn(
+        warn(
           opts,
           'When provided, the `prefill` property of an element of `additionalSignUpFields` must be a non-empty string or a function.'
         );
@@ -175,7 +184,7 @@ function processDatabaseOptions(opts) {
 
       const types = ['select', 'text', 'checkbox', 'hidden'];
       if (type != undefined && (typeof type != 'string' || types.indexOf(type) === -1)) {
-        l.warn(
+        warn(
           opts,
           `When provided, the \`type\` property of an element of \`additionalSignUpFields\` must be one of the following strings: "${types.join(
             '", "'
@@ -185,7 +194,7 @@ function processDatabaseOptions(opts) {
       }
 
       if (validator != undefined && type === 'select') {
-        l.warn(
+        warn(
           opts,
           'Elements of `additionalSignUpFields` with a "select" `type` cannot specify a `validator` function, all of its `options` are assumed to be valid.'
         );
@@ -193,7 +202,7 @@ function processDatabaseOptions(opts) {
       }
 
       if (validator != undefined && typeof validator != 'function') {
-        l.warn(
+        warn(
           opts,
           'When provided, the `validator` property of an element of `additionalSignUpFields` must be a function.'
         );
@@ -201,7 +210,7 @@ function processDatabaseOptions(opts) {
       }
 
       if (options != undefined && type != 'select') {
-        l.warn(
+        warn(
           opts,
           'The `options` property can only by provided for an element of `additionalSignUpFields` when its `type` equals to "select"'
         );
@@ -212,14 +221,14 @@ function processDatabaseOptions(opts) {
         (options != undefined && !global.Array.isArray(options) && typeof options != 'function') ||
         (type === 'select' && options === undefined)
       ) {
-        l.warn(
+        warn(
           opts,
           `Ignoring an element of \`additionalSignUpFields\` (${name}) because it has a "select" \`type\` but does not specify an \`options\` property that is an Array or a function.`
         );
         filter = false;
       }
       if (type === 'hidden' && !value) {
-        l.warn(
+        warn(
           opts,
           `Ignoring an element of \`additionalSignUpFields\` (${name}) because it has a "hidden" \`type\` but does not specify a \`value\` string.`
         );
@@ -335,7 +344,7 @@ export function overrideDatabaseOptions(m, opts) {
 
 export function defaultDatabaseConnection(m) {
   const name = defaultDatabaseConnectionName(m);
-  return name && l.findConnection(m, name);
+  return name && findConnection(m, name);
 }
 
 export function defaultDatabaseConnectionName(m) {
@@ -344,10 +353,10 @@ export function defaultDatabaseConnectionName(m) {
 
 export function databaseConnection(m) {
   return (
-    l.resolvedConnection(m) ||
+    resolvedConnection(m) ||
     defaultDirectory(m) ||
     defaultDatabaseConnection(m) ||
-    l.connection(m, 'database')
+    connection(m, 'database')
   );
 }
 
@@ -367,8 +376,8 @@ export function setScreen(m, name, fields = []) {
   // TODO: the lock/index module should provide a way to clear
   // everything that needs the be cleared when changing screens, other
   // modules should not care.
-  m = l.clearGlobalError(m);
-  m = l.clearGlobalSuccess(m);
+  m = clearGlobalError(m);
+  m = clearGlobalSuccess(m);
   m = hideInvalidFields(m, fields);
   m = clearFields(m, fields);
 
@@ -400,15 +409,15 @@ export function databaseConnectionRequiresUsername(m) {
 }
 
 export function databaseUsernameStyle(m) {
-  if (l.hasSomeConnections(m, 'database')) {
-    if (l.connectionResolver(m)) {
+  if (hasSomeConnections(m, 'database')) {
+    if (connectionResolver(m)) {
       return 'username';
     }
 
     return databaseConnectionRequiresUsername(m) ? get(m, 'usernameStyle', 'any') : 'email';
   }
 
-  return l.hasSomeConnections(m, 'enterprise') && findADConnectionWithoutDomain(m)
+  return hasSomeConnections(m, 'enterprise') && findADConnectionWithoutDomain(m)
     ? 'username'
     : 'email';
 }

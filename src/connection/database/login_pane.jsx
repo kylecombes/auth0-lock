@@ -5,13 +5,78 @@ import UsernamePane from '../../field/username/username_pane';
 import PasswordPane from '../../field/password/password_pane';
 import { showResetPasswordActivity, swapCaptcha } from './actions';
 import { hasScreen, forgotPasswordLink } from './index';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import CaptchaPane from '../../field/captcha/captcha_pane';
 
 export default class LoginPane extends React.Component {
   handleDontRememberPasswordClick = e => {
     e.preventDefault();
-    showResetPasswordActivity(l.id(this.props.lock));
+    showResetPasswordActivity(id(this.props.lock));
   };
 
   render() {
@@ -30,7 +95,7 @@ export default class LoginPane extends React.Component {
 
     const headerText = instructions || null;
     const header = headerText && <p>{headerText}</p>;
-    const resolver = l.connectionResolver(lock);
+    const resolver = connectionResolver(lock);
 
     // Should never validate format on login because of custom db connection and import mode.
     // If a custom resolver is in use, always use UsernamePane without validating format,
@@ -56,8 +121,8 @@ export default class LoginPane extends React.Component {
       );
 
     const captchaPane =
-      l.captcha(lock) && l.captcha(lock).get('required') ? (
-        <CaptchaPane i18n={i18n} lock={lock} onReload={() => swapCaptcha(l.id(lock), false)} />
+      captcha(lock) && captcha(lock).get('required') ? (
+        <CaptchaPane i18n={i18n} lock={lock} onReload={() => swapCaptcha(id(lock), false)} />
       ) : null;
 
     const dontRememberPassword =

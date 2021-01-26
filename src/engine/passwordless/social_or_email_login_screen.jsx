@@ -8,12 +8,77 @@ import { toggleTermsAcceptance } from '../../connection/passwordless/actions';
 import { requestPasswordlessEmail } from '../../connection/passwordless/actions';
 import { renderEmailSentConfirmation } from '../../connection/passwordless/email_sent_confirmation';
 import { renderSignedInConfirmation } from '../../core/signed_in_confirmation';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 
 import SignUpTerms from '../../connection/database/sign_up_terms';
 
 const Component = ({ i18n, model }) => {
-  const social = l.hasSomeConnections(model, 'social') ? (
+  const social = hasSomeConnections(model, 'social') ? (
     <SocialButtonsPane
       instructions={i18n.html('socialLoginInstructions')}
       labelFn={i18n.str}
@@ -22,7 +87,7 @@ const Component = ({ i18n, model }) => {
     />
   ) : null;
 
-  const email = l.hasSomeConnections(model, 'passwordless', 'email') ? (
+  const email = hasSomeConnections(model, 'passwordless', 'email') ? (
     <EmailPane
       i18n={i18n}
       lock={model}
@@ -61,7 +126,7 @@ export default class SocialOrEmailLoginScreen extends Screen {
   }
 
   submitHandler(m) {
-    return l.hasSomeConnections(m, 'passwordless', 'email') ? requestPasswordlessEmail : null;
+    return hasSomeConnections(m, 'passwordless', 'email') ? requestPasswordlessEmail : null;
   }
 
   renderAuxiliaryPane(lock) {
@@ -76,7 +141,7 @@ export default class SocialOrEmailLoginScreen extends Screen {
   }
 
   renderTerms(m, terms) {
-    const checkHandler = mustAcceptTerms(m) ? () => toggleTermsAcceptance(l.id(m)) : undefined;
+    const checkHandler = mustAcceptTerms(m) ? () => toggleTermsAcceptance(id(m)) : undefined;
     return terms && showTerms(m) ? (
       <SignUpTerms
         showCheckbox={mustAcceptTerms(m)}

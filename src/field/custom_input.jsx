@@ -4,7 +4,72 @@ import { getFieldInvalidHint, getFieldLabel, getFieldValue, isFieldVisiblyInvali
 import TextInput from '../ui/input/text_input';
 import SelectInput from '../ui/input/select_input';
 import CheckboxInput from '../ui/input/checkbox_input';
-import * as l from '../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../core/index';
 
 const CustomInput = ({
   iconUrl,
@@ -30,29 +95,29 @@ const CustomInput = ({
       return (
         <SelectInput
           {...props}
-          lockId={l.id(model)}
+          lockId={id(model)}
           label={getFieldLabel(model, name)}
-          onClick={() => startOptionSelection(l.id(model), name, iconUrl)}
+          onClick={() => startOptionSelection(id(model), name, iconUrl)}
         />
       );
     case 'checkbox':
       return (
         <CheckboxInput
-          lockId={l.id(model)}
-          onChange={e => changeField(l.id(model), name, `${e.target.checked}`, validator)}
+          lockId={id(model)}
+          onChange={e => changeField(id(model), name, `${e.target.checked}`, validator)}
           checked={getFieldValue(model, name)}
           placeholderHTML={placeholderHTML}
           {...props}
         />
       );
     case 'hidden':
-      return <input id={l.id(model)} type="hidden" value={value} name={name} />;
+      return <input id={id(model)} type="hidden" value={value} name={name} />;
     default:
       return (
         <TextInput
-          lockId={l.id(model)}
+          lockId={id(model)}
           invalidHint={getFieldInvalidHint(model, name)}
-          onChange={e => changeField(l.id(model), name, e.target.value, validator)}
+          onChange={e => changeField(id(model), name, e.target.value, validator)}
           value={getFieldValue(model, name)}
           {...props}
         />

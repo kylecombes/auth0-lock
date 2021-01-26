@@ -12,14 +12,79 @@ import {
   passwordlessStarted
 } from '../connection/passwordless/index';
 import { isDone, isSuccess } from '../sync';
-import * as l from '../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../core/index';
 import { hasSkippedQuickAuth } from '../quick_auth';
 import * as sso from '../core/sso/index';
 import { setEmail } from '../field/email';
 import { setPhoneNumber } from '../field/phone_number';
 
 const setPrefill = m => {
-  const { email, phoneNumber } = l.prefill(m).toJS();
+  const { email, phoneNumber } = prefill(m).toJS();
   if (typeof email === 'string') {
     m = setEmail(m, email);
   }
@@ -37,15 +102,15 @@ class Passwordless {
   }
 
   didReceiveClientSettings(m) {
-    const anySocialConnection = l.hasSomeConnections(m, 'social');
-    const anyPasswordlessConnection = l.hasSomeConnections(m, 'passwordless');
+    const anySocialConnection = hasSomeConnections(m, 'social');
+    const anyPasswordlessConnection = hasSomeConnections(m, 'passwordless');
 
     if (!anySocialConnection && !anyPasswordlessConnection) {
       const error = new Error(
         'At least one email, sms or social connection needs to be available.'
       );
       error.code = 'no_connection';
-      m = l.stop(m, error);
+      m = stop(m, error);
     }
     m = setPrefill(m);
 
@@ -54,7 +119,7 @@ class Passwordless {
 
   render(m) {
     //if there's an error, we should show the error screen no matter what.
-    if (l.hasStopped(m)) {
+    if (hasStopped(m)) {
       return new ErrorScreen();
     }
 
@@ -65,18 +130,18 @@ class Passwordless {
     }
 
     if (!hasSkippedQuickAuth(m)) {
-      if (l.ui.rememberLastLogin(m)) {
+      if (ui.rememberLastLogin(m)) {
         const lastUsedConnection = sso.lastUsedConnection(m);
         const lastUsedUsername = sso.lastUsedUsername(m);
         if (
           lastUsedConnection &&
           isSuccess(m, 'sso') &&
-          l.hasConnection(m, lastUsedConnection.get('name')) &&
+          hasConnection(m, lastUsedConnection.get('name')) &&
           ['passwordless', 'social'].indexOf(
-            l.findConnection(m, lastUsedConnection.get('name')).get('type')
+            findConnection(m, lastUsedConnection.get('name')).get('type')
           ) >= 0 //if connection.type is either passwordless or social
         ) {
-          const conn = l.findConnection(m, lastUsedConnection.get('name'));
+          const conn = findConnection(m, lastUsedConnection.get('name'));
           const connectionType = conn.get('type');
           if (connectionType === 'passwordless' || connectionType === 'social') {
             return new LastLoginScreen();

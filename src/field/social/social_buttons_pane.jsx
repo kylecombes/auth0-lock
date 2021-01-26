@@ -1,7 +1,72 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import AuthButton from '../../ui/button/auth_button';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { logIn } from '../../quick-auth/actions';
 import { displayName, socialConnections, authButtonsTheme } from '../../connection/social/index';
 import { emitFederatedLoginEvent } from './event';
@@ -14,7 +79,7 @@ export default class SocialButtonsPane extends React.Component {
       return signUpError(lock.get('id'), { code: 'social_signup_needs_terms_acception' });
     }
     emitFederatedLoginEvent(this.props.lock, provider, isSignUp);
-    return logIn(l.id(this.props.lock), provider);
+    return logIn(id(this.props.lock), provider);
   }
 
   render() {

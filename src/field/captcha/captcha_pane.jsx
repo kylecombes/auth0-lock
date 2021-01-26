@@ -3,7 +3,72 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import CaptchaInput from '../../ui/input/captcha_input';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { swap, updateEntity } from '../../store/index';
 import * as captchaField from '../captcha';
 import { getFieldValue, isFieldVisiblyInvalid } from '../index';
@@ -13,9 +78,9 @@ export default class CaptchaPane extends React.Component {
   render() {
     const { i18n, lock, onReload } = this.props;
 
-    const lockId = l.id(lock);
+    const lockId = id(lock);
 
-    const captcha = l.captcha(lock);
+    const captcha = captcha(lock);
 
     const value = getFieldValue(lock, 'captcha');
     const isValid = !isFieldVisiblyInvalid(lock, 'captcha');
@@ -34,7 +99,7 @@ export default class CaptchaPane extends React.Component {
           sitekey={captcha.get('siteKey')}
           onChange={handleChange}
           onExpired={reset}
-          hl={l.ui.language(lock)}
+          hl={ui.language(lock)}
           isValid={isValid}
           value={value}
         />

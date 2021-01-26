@@ -2,18 +2,18 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import SuccessPane from '../ui/box/success_pane';
 import { closeLock } from './actions';
-import * as l from './index';
+import { id, ui, loggedIn } from './index';
 import * as i18n from '../i18n'; // TODO: can't we get this from pops?
 
 export default class SignedInConfirmation extends React.Component {
   handleClose() {
     const { closeHandler, lock } = this.props;
-    closeHandler(l.id(lock));
+    closeHandler(id(lock));
   }
 
   render() {
     const { lock } = this.props;
-    const closeHandler = l.ui.closable(lock) ? ::this.handleClose : undefined;
+    const closeHandler = ui.closable(lock) ? ::this.handleClose : undefined;
 
     return (
       <SuccessPane lock={lock} closeHandler={closeHandler}>
@@ -33,5 +33,5 @@ export function renderSignedInConfirmation(lock, props = {}) {
   props.key = 'auxiliarypane';
   props.lock = lock;
 
-  return l.loggedIn(lock) ? <SignedInConfirmation {...props} /> : null;
+  return loggedIn(lock) ? <SignedInConfirmation {...props} /> : null;
 }

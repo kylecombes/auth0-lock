@@ -1,6 +1,6 @@
 import urljoin from 'url-join';
 import { load } from '../../utils/cdn_utils';
-import * as l from '../index';
+import { filterConnections, runHook } from '../index';
 import { initClient } from './index';
 
 export function fetchClientSettings(clientID, clientBaseUrl, cb) {
@@ -14,7 +14,7 @@ export function fetchClientSettings(clientID, clientBaseUrl, cb) {
 
 export function syncClientSettingsSuccess(m, result) {
   m = initClient(m, result);
-  m = l.filterConnections(m);
-  m = l.runHook(m, 'didReceiveClientSettings');
+  m = filterConnections(m);
+  m = runHook(m, 'didReceiveClientSettings');
   return m;
 }

@@ -1,6 +1,71 @@
 import I from 'immutable';
 import { logIn } from '../../../connection/enterprise/actions';
-import * as l from '../../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../../core/index';
 import { setField, getFieldValue } from '../../../field/index';
 
 jest.mock('connection/database/index', () => ({
@@ -38,7 +103,7 @@ describe('Login with connection scopes', () => {
 
   describe('for an SSO connection', () => {
     it.only('passes connectionScopes to the connection', () => {
-      lock = l.setup('__lock__', 'client', 'domain', {
+      lock = setup('__lock__', 'client', 'domain', {
         auth: {
           connectionScopes: {
             'sso-connection': ['offline_access']
@@ -68,7 +133,7 @@ describe('Login with connection scopes', () => {
 
   describe('for a non-SSO connection', () => {
     it.only('passes connectionScopes to the connection', () => {
-      lock = l.setup('__lock__', 'client', 'domain', {
+      lock = setup('__lock__', 'client', 'domain', {
         auth: {
           connectionScopes: {
             'enterprise-connection': ['offline_access']

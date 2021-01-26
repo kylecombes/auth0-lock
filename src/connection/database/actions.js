@@ -2,7 +2,16 @@ import Immutable, { Map } from 'immutable';
 import { getEntity, read, swap, updateEntity } from '../../store/index';
 import webApi from '../../core/web_api';
 import { closeLock, logIn as coreLogIn, logInSuccess, validateAndSubmit } from '../../core/actions';
-import * as l from '../../core/index';
+import {
+  auth,
+  captcha,
+  emitEvent,
+  loginErrorMessage,
+  setCaptcha,
+  setGlobalSuccess,
+  setSubmitting,
+  ui
+} from '../../core/index';
 import * as c from '../../field/index';
 import {
   databaseConnection,
@@ -70,7 +79,7 @@ export function signUp(id) {
   const fields = ['email', 'password'];
 
   // Skip the username validation if signUpHideUsernameField option is enabled.
-  // We will generate a random username to avoid name collusion before we make the signup API call.
+  // We will generate a random username to avoid name collusion before we make the signup API cal
   if (databaseConnectionRequiresUsername(m) && !signUpHideUsernameField(m)) fields.push('username');
 
   additionalSignUpFields(m).forEach(x => fields.push(x.get('name')));
@@ -137,7 +146,7 @@ export function signUp(id) {
 function signUpSuccess(id, result, popupHandler) {
   const lock = read(getEntity, 'lock', id);
 
-  l.emitEvent(lock, 'signup success', result);
+  emitEvent(lock, 'signup success', result);
 
   if (shouldAutoLogin(lock)) {
     swap(updateEntity, 'lock', id, m => m.set('signedUp', true));
@@ -153,7 +162,7 @@ function signUpSuccess(id, result, popupHandler) {
       options.popupHandler = popupHandler;
     }
 
-    return webApi.logIn(id, options, l.auth.params(lock).toJS(), (error, ...args) => {
+    return webApi.logIn(id, options, auth.params(lock).toJS(), (error, ...args) => {
       if (error) {
         setTimeout(() => autoLogInError(id, error), 250);
       } else {
@@ -162,10 +171,10 @@ function signUpSuccess(id, result, popupHandler) {
     });
   }
 
-  const autoclose = l.ui.autoclose(lock);
+  const autoclose = ui.autoclose(lock);
 
   if (!autoclose) {
-    swap(updateEntity, 'lock', id, lock => l.setSubmitting(lock, false).set('signedUp', true));
+    swap(updateEntity, 'lock', id, lock => setSubmitting(lock, false).set('signedUp', true));
   } else {
     closeLock(id, false);
   }
@@ -187,25 +196,25 @@ export function signUpError(id, error) {
     i18n.html(m, ['error', 'signUp', errorKey]) ||
     i18n.html(m, ['error', 'signUp', 'lock.fallback']);
 
-  l.emitEvent(m, 'signup error', error);
+  emitEvent(m, 'signup error', error);
 
   if (errorKey === 'invalid_captcha') {
     errorMessage = i18n.html(m, ['error', 'login', errorKey]);
     return swapCaptcha(id, true, () => {
-      swap(updateEntity, 'lock', id, l.setSubmitting, false, errorMessage);
+      swap(updateEntity, 'lock', id, setSubmitting, false, errorMessage);
     });
   }
 
-  swap(updateEntity, 'lock', id, l.setSubmitting, false, errorMessage);
+  swap(updateEntity, 'lock', id, setSubmitting, false, errorMessage);
 }
 
 function autoLogInError(id, error) {
   swap(updateEntity, 'lock', id, m => {
-    const errorMessage = l.loginErrorMessage(m, error);
+    const errorMessage = loginErrorMessage(m, error);
     if (hasScreen(m, 'login')) {
-      return l.setSubmitting(setScreen(m, 'login'), false, errorMessage);
+      return setSubmitting(setScreen(m, 'login'), false, errorMessage);
     } else {
-      return l.setSubmitting(m, false, errorMessage);
+      return setSubmitting(m, false, errorMessage);
     }
   });
 }
@@ -234,19 +243,19 @@ function resetPasswordSuccess(id) {
       updateEntity,
       'lock',
       id,
-      m => setScreen(l.setSubmitting(m, false), 'login', ['']) // array with one empty string tells the function to not clear any field
+      m => setScreen(setSubmitting(m, false), 'login', ['']) // array with one empty string tells the function to not clear any field
     );
 
     // TODO: should be handled by box
     setTimeout(() => {
       const successMessage = i18n.html(m, ['success', 'forgotPassword']);
-      swap(updateEntity, 'lock', id, l.setGlobalSuccess, successMessage);
+      swap(updateEntity, 'lock', id, setGlobalSuccess, successMessage);
     }, 500);
   } else {
-    if (l.ui.autoclose(m)) {
+    if (ui.autoclose(m)) {
       closeLock(id);
     } else {
-      swap(updateEntity, 'lock', id, m => l.setSubmitting(m, false).set('passwordResetted', true));
+      swap(updateEntity, 'lock', id, m => setSubmitting(m, false).set('passwordResetted', true));
     }
   }
 }
@@ -258,7 +267,7 @@ function resetPasswordError(id, error) {
     i18n.html(m, ['error', 'forgotPassword', error.code]) ||
     i18n.html(m, ['error', 'forgotPassword', 'lock.fallback']);
 
-  swap(updateEntity, 'lock', id, l.setSubmitting, false, errorMessage);
+  swap(updateEntity, 'lock', id, setSubmitting, false, errorMessage);
 }
 
 export function showLoginActivity(id, fields = ['password']) {
@@ -299,7 +308,7 @@ export function showLoginMFAActivity(id, fields = ['mfa_code']) {
 export function swapCaptcha(id, wasInvalid, next) {
   return webApi.getChallenge(id, (err, newCaptcha) => {
     if (!err && newCaptcha) {
-      swap(updateEntity, 'lock', id, l.setCaptcha, newCaptcha, wasInvalid);
+      swap(updateEntity, 'lock', id, setCaptcha, newCaptcha, wasInvalid);
     }
     if (next) {
       next();
@@ -314,12 +323,12 @@ export function swapCaptcha(id, wasInvalid, next) {
  * @param {Number} id
  */
 function showMissingCaptcha(m, id) {
-  const captchaConfig = l.captcha(m);
+  const captchaConfig = captcha(m);
   const captchaError =
     captchaConfig.get('provider') === 'recaptcha_v2' ? 'invalid_recaptcha' : 'invalid_captcha';
   const errorMessage = i18n.html(m, ['error', 'login', captchaError]);
   swap(updateEntity, 'lock', id, m => {
-    m = l.setSubmitting(m, false, errorMessage);
+    m = setSubmitting(m, false, errorMessage);
     return c.showInvalidField(m, 'captcha');
   });
   return m;
@@ -335,8 +344,8 @@ function showMissingCaptcha(m, id) {
  * @returns {Boolean} returns true if is required and missing the response from the user
  */
 function setCaptchaParams(m, params, fields) {
-  const captchaConfig = l.captcha(m);
-  const isCaptchaRequired = captchaConfig && l.captcha(m).get('required');
+  const captchaConfig = captcha(m);
+  const isCaptchaRequired = captchaConfig && captcha(m).get('required');
   if (!isCaptchaRequired) {
     return true;
   }

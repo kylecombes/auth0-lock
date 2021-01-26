@@ -3,17 +3,82 @@ import React from 'react';
 import PasswordInput from '../../ui/input/password_input';
 import * as c from '../index';
 import { swap, updateEntity } from '../../store/index';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { setPassword, setShowPassword } from '../password';
 
 export default class PasswordPane extends React.Component {
   handleChange = e => {
     const { lock, policy } = this.props;
-    swap(updateEntity, 'lock', l.id(lock), setPassword, e.target.value, policy);
+    swap(updateEntity, 'lock', id(lock), setPassword, e.target.value, policy);
   };
   handleShowPasswordChange = e => {
     const { lock } = this.props;
-    swap(updateEntity, 'lock', l.id(lock), setShowPassword, e.target.checked);
+    swap(updateEntity, 'lock', id(lock), setShowPassword, e.target.checked);
   };
 
   render() {
@@ -36,12 +101,12 @@ export default class PasswordPane extends React.Component {
           onChange={this.handleChange}
           placeholder={placeholder}
           strengthMessages={strengthMessages}
-          disabled={l.submitting(lock)}
+          disabled={submitting(lock)}
           policy={policy}
           showPassword={c.getFieldValue(lock, 'showPassword', false)}
           lock={lock}
         />
-        {l.ui.allowShowPassword(lock) && (
+        {ui.allowShowPassword(lock) && (
           <div className="auth0-lock-show-password">
             <input type="checkbox" id="slideOne" onChange={this.handleShowPasswordChange} />
             <label htmlFor="slideOne" title={i18n.str('showPassword')} />

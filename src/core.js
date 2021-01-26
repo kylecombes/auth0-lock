@@ -11,8 +11,72 @@ import {
   setupLock,
   updateLock
 } from './core/actions';
-import * as l from './core/index';
-import * as c from './field/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from './core/index';
+
 import * as idu from './utils/id_utils';
 import * as i18n from './i18n';
 
@@ -68,11 +132,11 @@ export default class Base extends EventEmitter {
     let m = setupLock(this.id, clientID, domain, options, hookRunner, emitEventFn, handleEventFn);
     this.on('newListener', type => {
       if (this.validEvents.indexOf(type) === -1) {
-        l.emitUnrecoverableErrorEvent(m, `Invalid event "${type}".`);
+        emitUnrecoverableErrorEvent(m, `Invalid event "${type}".`);
       }
     });
 
-    if (l.auth.autoParseHash(m) && !Base.hasScheduledAuthCallback) {
+    if (auth.autoParseHash(m) && !Base.hasScheduledAuthCallback) {
       Base.hasScheduledAuthCallback = true;
       setTimeout(handleAuthCallback, 0);
     }
@@ -80,12 +144,12 @@ export default class Base extends EventEmitter {
     observe('render', this.id, m => {
       const partialApplyId = (screen, handlerName) => {
         const handler = screen[handlerName](m);
-        return handler ? (...args) => handler(l.id(m), ...args) : handler;
+        return handler ? (...args) => handler(id(m), ...args) : handler;
       };
       const avatar =
-        (l.ui.avatar(m) && m.getIn(['avatar', 'transient', 'syncStatus']) === 'ok') || null;
+        (ui.avatar(m) && m.getIn(['avatar', 'transient', 'syncStatus']) === 'ok') || null;
 
-      if (l.rendering(m)) {
+      if (rendering(m)) {
         const screen = this.engine.render(m);
 
         const title = avatar
@@ -102,60 +166,60 @@ export default class Base extends EventEmitter {
 
         const getScreenTitle = m => {
           // if it is the first screen and the flag is enabled, it should hide the title
-          return l.ui.hideMainScreenTitle(m) && screen.isFirstScreen(m) ? null : title;
+          return ui.hideMainScreenTitle(m) && screen.isFirstScreen(m) ? null : title;
         };
 
         const props = {
           avatar: avatar && m.getIn(['avatar', 'transient', 'url']),
           auxiliaryPane: screen.renderAuxiliaryPane(m),
-          autofocus: l.ui.autofocus(m),
+          autofocus: ui.autofocus(m),
           backHandler: partialApplyId(screen, 'backHandler'),
           badgeLink: 'https://auth0.com/?utm_source=lock&utm_campaign=badge&utm_medium=widget',
-          closeHandler: l.ui.closable(m) ? (...args) => closeLock(l.id(m), ...args) : undefined,
+          closeHandler: ui.closable(m) ? (...args) => closeLock(id(m), ...args) : undefined,
           contentComponent: screen.render(),
           contentProps: { i18n: i18nProp, model: m },
           disableSubmitButton: disableSubmitButton,
-          error: l.globalError(m),
-          info: l.globalInfo(m),
-          isMobile: l.ui.mobile(m),
-          isModal: l.ui.appendContainer(m),
-          isSubmitting: l.submitting(m),
-          language: l.ui.language(m),
-          logo: l.ui.logo(m),
-          primaryColor: l.ui.primaryColor(m),
+          error: globalError(m),
+          info: globalInfo(m),
+          isMobile: ui.mobile(m),
+          isModal: ui.appendContainer(m),
+          isSubmitting: submitting(m),
+          language: ui.language(m),
+          logo: ui.logo(m),
+          primaryColor: ui.primaryColor(m),
           screenName: screen.name,
-          showBadge: l.showBadge(m) === true,
-          success: l.globalSuccess(m),
-          submitButtonLabel: l.ui.labeledSubmitButton(m) ? screen.submitButtonLabel(m) : null,
+          showBadge: showBadge(m) === true,
+          success: globalSuccess(m),
+          submitButtonLabel: ui.labeledSubmitButton(m) ? screen.submitButtonLabel(m) : null,
           submitHandler: partialApplyId(screen, 'submitHandler'),
           tabs: screen.renderTabs(m),
           terms: screen.renderTerms(m, i18nProp.html('signUpTerms')),
           title: getScreenTitle(m),
           classNames: screen.name === 'loading' ? 'fade' : 'horizontal-fade',
-          scrollGlobalMessagesIntoView: l.ui.scrollGlobalMessagesIntoView(m),
-          suppressSubmitOverlay: l.suppressSubmitOverlay(m) || false
+          scrollGlobalMessagesIntoView: ui.scrollGlobalMessagesIntoView(m),
+          suppressSubmitOverlay: suppressSubmitOverlay(m) || false
         };
-        render(l.ui.containerID(m), props);
+        render(ui.containerID(m), props);
 
         // TODO: hack so we can start testing the beta
         if (!this.oldScreenName || this.oldScreenName != screen.name) {
           if (screen.name === 'main.login') {
-            l.emitEvent(m, 'signin ready');
+            emitEvent(m, 'signin ready');
           } else if (screen.name === 'main.signUp') {
-            l.emitEvent(m, 'signup ready');
+            emitEvent(m, 'signup ready');
           } else if (screen.name === 'forgotPassword') {
-            l.emitEvent(m, 'forgot_password ready');
+            emitEvent(m, 'forgot_password ready');
           } else if (screen.name === 'socialOrEmail') {
-            l.emitEvent(m, 'socialOrEmail ready');
+            emitEvent(m, 'socialOrEmail ready');
           } else if (screen.name === 'socialOrPhoneNumber') {
-            l.emitEvent(m, 'socialOrPhoneNumber ready');
+            emitEvent(m, 'socialOrPhoneNumber ready');
           } else if (screen.name === 'vcode') {
-            l.emitEvent(m, 'vcode ready');
+            emitEvent(m, 'vcode ready');
           }
         }
         this.oldScreenName = screen.name;
       } else {
-        remove(l.ui.containerID(m));
+        remove(ui.containerID(m));
       }
     });
   }

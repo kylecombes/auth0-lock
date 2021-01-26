@@ -3,7 +3,72 @@ import Screen from '../../core/screen';
 import QuickAuthPane from '../../ui/pane/quick_auth_pane';
 import { logIn } from '../../quick-auth/actions';
 import { renderSignedInConfirmation } from '../../core/signed_in_confirmation';
-import * as l from '../../core/index';
+
+import {
+  setResolvedConnection,
+  connectionResolver,
+  loggedIn,
+  countConnections,
+  hasSomeConnections,
+  hasOneConnection,
+  connections,
+  defaultADUsernameFromEmailPrefix,
+  clearGlobalError,
+  clearGlobalSuccess,
+  connection,
+  resolvedConnection,
+  findConnection,
+  error,
+  hasOnlyConnections,
+  prefill,
+  hasStopped,
+  hasConnection,
+  ui,
+  runHook,
+  filterConnections,
+  clientID,
+  submitting,
+  hashCleanup,
+  clientBaseUrl,
+  tenantBaseUrl,
+  useTenantInfo,
+  loginErrorMessage,
+  setGlobalSuccess,
+  setCaptcha,
+  setSubmitting,
+  captcha,
+  emitEvent,
+  languageBaseUrl,
+  warn,
+  suppressSubmitOverlay,
+  stopRendering,
+  stop,
+  showBadge,
+  setSupressSubmitOverlay,
+  setLoggedIn,
+  setGlobalInfo,
+  setGlobalError,
+  reset,
+  rendering,
+  render,
+  overrideOptions,
+  handleEvent,
+  globalSuccess,
+  globalInfo,
+  globalError,
+  extractTenantBaseUrlOption,
+  emitUnrecoverableErrorEvent,
+  emitHashParsedEvent,
+  emitAuthorizationErrorEvent,
+  emitAuthenticatedEvent,
+  domain,
+  clearGlobalInfo,
+  auth,
+  allowedConnections,
+  id,
+  withAuthOptions,
+  setup
+} from '../../core/index';
 import { quickAuthConnection } from '../enterprise';
 import { authButtonsTheme } from '../../connection/social/index';
 
@@ -22,7 +87,7 @@ const Component = ({ i18n, model }) => {
   const connectionName = connection.getIn(['name']);
   const connectionDomain = connection.getIn(['domains', 0]);
   const connectionDisplayName = connection.getIn(['displayName']) || null;
-  const preferConnectionDisplayName = l.ui.preferConnectionDisplayName(model);
+  const preferConnectionDisplayName = ui.preferConnectionDisplayName(model);
   const buttonTheme = theme.get(connection.get('name'));
 
   const buttonLabel =
@@ -40,7 +105,7 @@ const Component = ({ i18n, model }) => {
   return (
     <QuickAuthPane
       buttonLabel={buttonLabel}
-      buttonClickHandler={e => logIn(l.id(model), quickAuthConnection(model))}
+      buttonClickHandler={e => logIn(id(model), quickAuthConnection(model))}
       header={header}
       buttonIcon={buttonIcon}
       primaryColor={primaryColor}

@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import UsernamePane from '../../field/username/username_pane';
 import PasswordPane from '../../field/password/password_pane';
-import * as l from '../../core/index';
 
 export default class HRDPane extends React.Component {
   render() {

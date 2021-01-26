@@ -1,6 +1,11 @@
 import Immutable, { List } from 'immutable';
-import * as l from '../core/index';
-import * as c from '../field/index';
+import {
+  hasSomeConnections,
+  defaultADUsernameFromEmailPrefix,
+  connections,
+  hasOneConnection,
+  warn
+} from '../core/index';
 import { dataFns } from '../utils/data_utils';
 import { emailDomain, emailLocalPart } from '../field/email';
 import { setUsername } from '../field/username';
@@ -42,7 +47,7 @@ function processOptions(opts) {
   let { defaultEnterpriseConnection } = opts;
 
   if (defaultEnterpriseConnection != undefined && typeof defaultEnterpriseConnection !== 'string') {
-    l.warn(
+    warn(
       opts,
       'The `defaultEnterpriseConnection` option will be ignored, because it is not a string.'
     );
@@ -77,7 +82,7 @@ export function enterpriseActiveFlowConnection(m) {
 export function matchConnection(m, email, strategies = []) {
   const target = emailDomain(email);
   if (!target) return false;
-  return l.connections(m, 'enterprise', ...strategies).find(x => {
+  return connections(m, 'enterprise', ...strategies).find(x => {
     return x.get('domains').contains(target);
   });
 }
@@ -88,13 +93,13 @@ export function isEnterpriseDomain(m, email, strategies = []) {
 
 export function enterpriseDomain(m) {
   return isSingleHRDConnection(m)
-    ? l.connections(m, 'enterprise').getIn([0, 'domains', 0])
+    ? connections(m, 'enterprise').getIn([0, 'domains', 0])
     : emailDomain(tget(m, 'hrdEmail'));
 }
 
 export function quickAuthConnection(m) {
-  return !isADEnabled(m) && l.hasOneConnection(m, 'enterprise')
-    ? l.connections(m, 'enterprise').get(0)
+  return !isADEnabled(m) && hasOneConnection(m, 'enterprise')
+    ? connections(m, 'enterprise').get(0)
     : null;
 }
 
@@ -102,17 +107,17 @@ export function quickAuthConnection(m) {
 // https://github.com/auth0/Lock.Android/blob/0145b6853a8de0df5e63ef22e4e2bc40be97ad9e/lock/src/main/java/com/auth0/android/lock/utils/Strategy.java#L67
 
 export function isADEnabled(m) {
-  return l.hasSomeConnections(m, 'enterprise', 'ad', 'auth0-adldap');
+  return hasSomeConnections(m, 'enterprise', 'ad', 'auth0-adldap');
 }
 
 export function findADConnectionWithoutDomain(m, name = undefined) {
-  return l.connections(m, 'enterprise', 'ad', 'auth0-adldap').find(x => {
+  return connections(m, 'enterprise', 'ad', 'auth0-adldap').find(x => {
     return x.get('domains').isEmpty() && (!name || x.get('name') === name);
   });
 }
 
 function findActiveFlowConnection(m, name = undefined) {
-  return l.connections(m, 'enterprise', 'ad', 'auth0-adldap').find(x => {
+  return connections(m, 'enterprise', 'ad', 'auth0-adldap').find(x => {
     return !name || x.get('name') === name;
   });
 }
@@ -135,7 +140,7 @@ export function corpNetworkConnection(m) {
 // hrd
 
 export function isSingleHRDConnection(m) {
-  return isADEnabled(m) && l.connections(m).count() === 1;
+  return isADEnabled(m) && connections(m).count() === 1;
 }
 
 export function isHRDDomain(m, email) {
@@ -144,7 +149,7 @@ export function isHRDDomain(m, email) {
 
 export function toggleHRD(m, email) {
   if (email) {
-    const username = l.defaultADUsernameFromEmailPrefix(m) ? emailLocalPart(email) : email;
+    const username = defaultADUsernameFromEmailPrefix(m) ? emailLocalPart(email) : email;
 
     m = setUsername(m, username, 'username', false);
     m = tset(m, 'hrdEmail', email);
@@ -166,8 +171,8 @@ export function isHRDActive(m) {
 export function isHRDEmailValid(m, str) {
   if (
     isEmail(str) &&
-    !l.hasSomeConnections(m, 'database') &&
-    !l.hasSomeConnections(m, 'passwordless') &&
+    !hasSomeConnections(m, 'database') &&
+    !hasSomeConnections(m, 'passwordless') &&
     !findADConnectionWithoutDomain(m) &&
     !matchesEnterpriseConnection(m, str)
   ) {
