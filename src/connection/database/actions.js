@@ -349,13 +349,13 @@ function setCaptchaParams(m, params, fields) {
   if (!isCaptchaRequired) {
     return true;
   }
-  const captcha = c.getFieldValue(m, 'captcha');
+  const captchaValue = c.getFieldValue(m, 'captcha');
   //captcha required and missing
-  if (!captcha) {
+  if (!captchaValue) {
     return false;
   }
 
-  params['captcha'] = captcha;
+  params['captcha'] = captchaValue;
   fields.push('captcha');
   return true;
 }

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Chrome from './chrome';
 import { CloseButton } from './button';
-import { connectionResolver, setResolvedConnection, id } from '../../core/index';
+import { connectionResolver, setResolvedConnection, id as lId } from '../../core/index';
 import * as c from '../../field/index';
 import { swap, updateEntity } from '../../store/index';
 
@@ -68,15 +68,15 @@ export default class Container extends React.Component {
   checkConnectionResolver(done) {
     const { contentProps } = this.props;
     const lock = contentProps.model;
-    const connectionResolver = connectionResolver(lock);
-    if (!connectionResolver) {
+    const connectionResolver2 = connectionResolver(lock);
+    if (!connectionResolver2) {
       return done();
     }
     const { connections, id } = lock.get('client').toJS();
     const context = { connections, id };
     const userInputValue = c.getFieldValue(lock, 'username') || c.getFieldValue(lock, 'email');
-    connectionResolver(userInputValue, context, resolvedConnection => {
-      swap(updateEntity, 'lock', id(lock), m => setResolvedConnection(m, resolvedConnection));
+    connectionResolver2(userInputValue, context, resolvedConnection => {
+      swap(updateEntity, 'lock', lId(lock), m => setResolvedConnection(m, resolvedConnection));
       done();
     });
   }
